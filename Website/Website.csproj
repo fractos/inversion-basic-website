@@ -52,6 +52,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -80,6 +84,7 @@
       <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -89,8 +94,28 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Razor.3.0.0\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq" />
@@ -103,6 +128,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Config\rewrite.config" />
+    <Content Include="Config\secrets.config" />
+    <Content Include="Resources\Views\Razor\Layouts\base.cshtml" />
+    <Content Include="Resources\Views\Razor\default.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -115,20 +144,61 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\Application\ConfigurationHelper.cs" />
+    <Compile Include="Code\Application\DefaultHandler.cs" />
+    <Compile Include="Code\Application\Settings.cs" />
+    <Compile Include="Code\Pipeline.cs" />
+    <Compile Include="Code\Storage.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Code\Application\" />
     <Folder Include="Code\Data\Model\" />
     <Folder Include="Code\Data\Store\" />
-    <Folder Include="Config\" />
     <Folder Include="Content\" />
     <Folder Include="Resources\Views\Razor\Includes\" />
-    <Folder Include="Resources\Views\Razor\Layouts\" />
+    <Folder Include="Resources\Views\Razor\Layouts\Includes\" />
     <Folder Include="Scripts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\submodules\inversion-data\Inversion.Data.Sql\Inversion.Data.Sql.csproj">
+      <Project>{1bdf9896-7d98-4bfa-b64b-dd31f79739f9}</Project>
+      <Name>Inversion.Data.Sql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion-data\Inversion.Data\Inversion.Data.csproj">
+      <Project>{1cb68d8f-fbce-4dac-858c-fed6fce48306}</Project>
+      <Name>Inversion.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion-extensibility\Inversion.Extensibility\Inversion.Extensibility.csproj">
+      <Project>{8bdf6f79-de72-4f83-b5dc-c1abc463b201}</Project>
+      <Name>Inversion.Extensibility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion-razor\Inversion.Razor\Inversion.Razor.csproj">
+      <Project>{fb77dff6-d23d-43c6-a777-1af3a864736f}</Project>
+      <Name>Inversion.Razor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion\Inversion.Naiad\Inversion.Naiad.csproj">
+      <Project>{975446b0-dbc2-498f-94d4-2a6a20f9c5d0}</Project>
+      <Name>Inversion.Naiad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion\Inversion.Process\Inversion.Process.csproj">
+      <Project>{37f59768-76ea-4d09-8976-bbc3540db5ae}</Project>
+      <Name>Inversion.Process</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion\Inversion.Web.AspNet\Inversion.Web.AspNet.csproj">
+      <Project>{faad5eaa-3432-4b69-b334-de4864efa213}</Project>
+      <Name>Inversion.Web.AspNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion\Inversion.Web\Inversion.Web.csproj">
+      <Project>{6951ba6b-4388-4fc8-8298-60da7563fee4}</Project>
+      <Name>Inversion.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\submodules\inversion\Inversion\Inversion.csproj">
+      <Project>{a2dbf0b8-b672-4237-8a0b-864bb0474054}</Project>
+      <Name>Inversion</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
+
+using Inversion.Collections;
+using Inversion.Data;
+using Inversion.Naiad;
+using Inversion.Process;
+using Inversion.Process.Behaviour;
+using Inversion.Process.Pipeline;
+
+using Website.Code.Application;
 
 namespace Website
 {
@@ -12,37 +17,25 @@ namespace Website
 
         protected void Application_Start(object sender, EventArgs e)
         {
+            IDictionary<string, string> settings = new Settings(ConfigurationHelper.GetConfiguration());
 
-        }
+            PipelineConfigurationHelper.Configure(ServiceContainer.Instance, settings, new List<string>
+            {
+                settings["prototype-provider"],
+                settings["pipeline-provider"],
+                settings["storage-provider"]
+            });
 
-        protected void Session_Start(object sender, EventArgs e)
-        {
+            IProcessContext context = new ProcessContext(ServiceContainer.Instance, FileSystemResourceAdapter.Instance);
 
-        }
+            context.ObjectCache.Add("settings", new DataDictionary<string>(settings), DateTimeOffset.MaxValue);
 
-        protected void Application_BeginRequest(object sender, EventArgs e)
-        {
+            IEnumerable<IProcessBehaviour> behaviours = ServiceContainer.Instance.GetService<List<IProcessBehaviour>>("application-behaviours");
+            context.Register(behaviours);
 
-        }
-
-        protected void Application_AuthenticateRequest(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_Error(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Session_End(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_End(object sender, EventArgs e)
-        {
-
+            context.Timers.Begin("application-start");
+            context.Fire("application-start");
+            context.Timers.End("application-start");
         }
     }
 }
